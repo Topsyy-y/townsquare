@@ -1,0 +1,17 @@
+# Gradle
+.gradle/
+build/
+
+# Servidor y cliente de pruebas que genera Loom (incluye un mundo entero)
+run/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Logs sueltos
+*.log
