@@ -7,7 +7,6 @@
 	"authors": ["my_gtt"],
 	"contact": {},
 	"license": "MIT",
-	"icon": "assets/townsquare/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": ["com.mygtt.townsquare.Townsquare"]
