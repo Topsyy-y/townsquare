@@ -13,6 +13,7 @@ public class Townsquare implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		Boards.register();
+		com.mygtt.townsquare.mail.MailBox.register();
 		ModCommands.register();
 		LOGGER.info("[Townsquare] Initialised. Boards ready.");
 	}

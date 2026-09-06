@@ -1,8 +1,11 @@
 package com.mygtt.townsquare.registry;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mygtt.townsquare.board.Boards;
+import com.mygtt.townsquare.mail.MailBox;
+import net.minecraft.world.item.ItemStack;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -17,7 +20,7 @@ public final class ModCommands {
 	}
 
 	public static void register() {
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> build(dispatcher));
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> { build(dispatcher); buildMail(dispatcher); });
 	}
 
 	private static void build(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -61,6 +64,70 @@ public final class ModCommands {
 		}
 		ctx.getSource().sendSuccess(() -> Component.literal("Tablon eliminado. Sus notas se han descartado."), false);
 		return 1;
+	}
+
+	private static void buildMail(CommandDispatcher<CommandSourceStack> dispatcher) {
+		dispatcher.register(Commands.literal("mail")
+				.then(Commands.literal("send")
+						.then(Commands.argument("entrada", StringArgumentType.greedyString())
+								.executes(ModCommands::mailSend)))
+				.then(Commands.literal("sendbook")
+						.then(Commands.argument("jugador", StringArgumentType.word())
+								.executes(ModCommands::mailSendBook)))
+				.then(Commands.literal("read").executes(ModCommands::mailRead)));
+	}
+
+	/** /mail send <jugador> <texto...> */
+	private static int mailSend(CommandContext<CommandSourceStack> ctx) {
+		ServerPlayer player = ctx.getSource().getPlayer();
+		if (player == null) {
+			ctx.getSource().sendFailure(Component.literal("Este comando necesita un jugador."));
+			return 0;
+		}
+		String[] parts = StringArgumentType.getString(ctx, "entrada").trim().split("\\s+", 2);
+		if (parts.length < 2 || parts[1].isBlank()) {
+			ctx.getSource().sendFailure(Component.literal("Uso: /mail send <jugador> <texto>"));
+			return 0;
+		}
+		MailBox.send(player.level().getServer(), parts[0], new MailBox.Mail(
+				player.getGameProfile().name(), parts[1], java.util.Optional.empty(),
+				java.time.Instant.now().getEpochSecond()));
+		ctx.getSource().sendSuccess(() -> Component.literal("Carta enviada a " + parts[0] + "."), false);
+		return 1;
+	}
+
+	/** Envia el item de la mano principal como adjunto. Se retira de la mano al enviarlo. */
+	private static int mailSendBook(CommandContext<CommandSourceStack> ctx) {
+		ServerPlayer player = ctx.getSource().getPlayer();
+		if (player == null) {
+			ctx.getSource().sendFailure(Component.literal("Este comando necesita un jugador."));
+			return 0;
+		}
+		ItemStack held = player.getMainHandItem();
+		if (held.isEmpty()) {
+			ctx.getSource().sendFailure(Component.literal("Lleva en la mano el libro o item que quieras enviar."));
+			return 0;
+		}
+		String recipient = StringArgumentType.getString(ctx, "jugador");
+		MailBox.send(player.level().getServer(), recipient, new MailBox.Mail(
+				player.getGameProfile().name(), "", java.util.Optional.of(held.copy()),
+				java.time.Instant.now().getEpochSecond()));
+		held.setCount(0);
+		ctx.getSource().sendSuccess(() -> Component.literal("Enviado a " + recipient + "."), false);
+		return 1;
+	}
+
+	private static int mailRead(CommandContext<CommandSourceStack> ctx) {
+		ServerPlayer player = ctx.getSource().getPlayer();
+		if (player == null) {
+			ctx.getSource().sendFailure(Component.literal("Este comando necesita un jugador."));
+			return 0;
+		}
+		int delivered = MailBox.deliver(player);
+		if (delivered == 0) {
+			ctx.getSource().sendSuccess(() -> Component.literal("No tienes cartas."), false);
+		}
+		return delivered;
 	}
 
 	private static int list(CommandContext<CommandSourceStack> ctx) {

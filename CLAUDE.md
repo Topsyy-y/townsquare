@@ -39,7 +39,11 @@ El tablon funciona: comando de admin sobre un atril, cofre de vanilla al usarlo,
 contenido persistido por dimension via attachment con codec. Verificado en
 servidor dedicado; falta probarlo con jugador conectado.
 
-Siguiente: filtrar que solo entren libros en el tablon, y despues el correo.
+El correo funciona: /mail send <jugador> <texto>, /mail sendbook (adjunta el item
+de la mano), aviso al conectar y entrega con /mail read. Buzones por nombre en
+minusculas en un attachment del overworld: funciona con el destinatario offline.
+
+Siguiente: filtro de solo-libros en el tablon, o los gremios.
 se abre un contenedor con las notas (libros escritos); clavar y quitar notas.
 
 ## Comandos utiles
