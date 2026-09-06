@@ -61,13 +61,13 @@ public final class Guilds {
 
 	public static String create(MinecraftServer server, String name, String ownerName) {
 		if (!name.matches("[A-Za-z0-9_]{3,16}")) {
-			return "El nombre debe ser de 3 a 16 caracteres, letras, numeros o _.";
+			return "Guild names are 3-16 characters: letters, numbers or _.";
 		}
 		if (byName(server, name).isPresent()) {
-			return "Ya existe un gremio con ese nombre.";
+			return "A guild with that name already exists.";
 		}
 		if (of(server, ownerName).isPresent()) {
-			return "Ya estas en un gremio. Sal primero con /guild leave.";
+			return "You are already in a guild. Leave it first with /guild leave.";
 		}
 		String owner = ownerName.toLowerCase(Locale.ROOT);
 		put(server, new Guild(name, owner, List.of(owner), List.of()));
@@ -77,14 +77,14 @@ public final class Guilds {
 	public static String invite(MinecraftServer server, String inviterName, String invitee) {
 		Guild guild = of(server, inviterName).orElse(null);
 		if (guild == null) {
-			return "No estas en ningun gremio.";
+			return "You are not in a guild.";
 		}
 		if (!guild.owner().equals(inviterName.toLowerCase(Locale.ROOT))) {
-			return "Solo el fundador puede invitar.";
+			return "Only the founder can invite.";
 		}
 		String key = invitee.toLowerCase(Locale.ROOT);
 		if (guild.members().contains(key)) {
-			return "Ya es miembro.";
+			return "Already a member.";
 		}
 		if (!guild.invites().contains(key)) {
 			List<String> invites = new ArrayList<>(guild.invites());
@@ -94,36 +94,36 @@ public final class Guilds {
 		ServerPlayer online = server.getPlayerList().getPlayerByName(invitee);
 		if (online != null) {
 			online.sendSystemMessage(Component.literal(
-					inviterName + " te invita al gremio " + guild.name() + ". Usa /guild join " + guild.name()));
+					inviterName + " invited you to guild " + guild.name() + ". Use /guild join " + guild.name()));
 		}
 		return null;
 	}
 
 	public static String join(MinecraftServer server, String playerName, String guildName) {
 		if (of(server, playerName).isPresent()) {
-			return "Ya estas en un gremio.";
+			return "You are already in a guild.";
 		}
 		Guild guild = byName(server, guildName).orElse(null);
 		if (guild == null) {
-			return "No existe ese gremio.";
+			return "That guild does not exist.";
 		}
 		String key = playerName.toLowerCase(Locale.ROOT);
 		if (!guild.invites().contains(key)) {
-			return "Necesitas una invitacion del fundador.";
+			return "You need an invitation from the founder.";
 		}
 		List<String> members = new ArrayList<>(guild.members());
 		members.add(key);
 		List<String> invites = new ArrayList<>(guild.invites());
 		invites.remove(key);
 		put(server, new Guild(guild.name(), guild.owner(), members, invites));
-		broadcast(server, byName(server, guildName).orElseThrow(), playerName + " se ha unido al gremio.");
+		broadcast(server, byName(server, guildName).orElseThrow(), playerName + " joined the guild.");
 		return null;
 	}
 
 	public static String leave(MinecraftServer server, String playerName) {
 		Guild guild = of(server, playerName).orElse(null);
 		if (guild == null) {
-			return "No estas en ningun gremio.";
+			return "You are not in a guild.";
 		}
 		String key = playerName.toLowerCase(Locale.ROOT);
 		if (guild.owner().equals(key)) {
@@ -131,13 +131,13 @@ public final class Guilds {
 			Map<String, Guild> map = mutable(server);
 			map.remove(guild.name().toLowerCase(Locale.ROOT));
 			server.overworld().setAttached(type, map);
-			broadcast(server, guild, "El gremio " + guild.name() + " ha sido disuelto por su fundador.");
+			broadcast(server, guild, "Guild " + guild.name() + " was disbanded by its founder.");
 			return null;
 		}
 		List<String> members = new ArrayList<>(guild.members());
 		members.remove(key);
 		put(server, new Guild(guild.name(), guild.owner(), members, guild.invites()));
-		broadcast(server, guild, playerName + " ha dejado el gremio.");
+		broadcast(server, guild, playerName + " left the guild.");
 		return null;
 	}
 
@@ -145,7 +145,7 @@ public final class Guilds {
 	public static String chat(MinecraftServer server, String playerName, String text) {
 		Guild guild = of(server, playerName).orElse(null);
 		if (guild == null) {
-			return "No estas en ningun gremio.";
+			return "You are not in a guild.";
 		}
 		broadcast(server, guild, "[" + guild.name() + "] " + playerName + ": " + text);
 		return null;

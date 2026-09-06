@@ -22,19 +22,19 @@ public final class GuildCommands {
 	private static void build(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(Commands.literal("guild")
 				.then(Commands.literal("create")
-						.then(Commands.argument("nombre", StringArgumentType.word())
+						.then(Commands.argument("name", StringArgumentType.word())
 								.executes(ctx -> run(ctx, (player, arg) ->
-										Guilds.create(server(player), arg, name(player)), "nombre",
-										"Gremio creado. Invita con /guild invite <jugador>."))))
+										Guilds.create(server(player), arg, name(player)), "name",
+										"Guild created. Invite players with /guild invite <player>."))))
 				.then(Commands.literal("invite")
-						.then(Commands.argument("jugador", StringArgumentType.word())
+						.then(Commands.argument("player", StringArgumentType.word())
 								.executes(ctx -> run(ctx, (player, arg) ->
-										Guilds.invite(server(player), name(player), arg), "jugador",
-										"Invitacion enviada."))))
+										Guilds.invite(server(player), name(player), arg), "player",
+										"Invitation sent."))))
 				.then(Commands.literal("join")
-						.then(Commands.argument("nombre", StringArgumentType.word())
+						.then(Commands.argument("name", StringArgumentType.word())
 								.executes(ctx -> run(ctx, (player, arg) ->
-										Guilds.join(server(player), name(player), arg), "nombre", null))))
+										Guilds.join(server(player), name(player), arg), "name", null))))
 				.then(Commands.literal("leave")
 						.executes(ctx -> run(ctx, (player, arg) ->
 								Guilds.leave(server(player), name(player)), null, null)))
@@ -42,9 +42,9 @@ public final class GuildCommands {
 						.executes(GuildCommands::info)));
 
 		dispatcher.register(Commands.literal("g")
-				.then(Commands.argument("texto", StringArgumentType.greedyString())
+				.then(Commands.argument("text", StringArgumentType.greedyString())
 						.executes(ctx -> run(ctx, (player, arg) ->
-								Guilds.chat(server(player), name(player), arg), "texto", null))));
+								Guilds.chat(server(player), name(player), arg), "text", null))));
 	}
 
 	/** Ejecuta una operacion que devuelve null si fue bien o el mensaje de error si no. */
@@ -52,7 +52,7 @@ public final class GuildCommands {
 			BiFunction<ServerPlayer, String, String> operation, String argName, String successMessage) {
 		ServerPlayer player = ctx.getSource().getPlayer();
 		if (player == null) {
-			ctx.getSource().sendFailure(Component.literal("Este comando necesita un jugador."));
+			ctx.getSource().sendFailure(Component.literal("This command needs a player."));
 			return 0;
 		}
 		String arg = argName == null ? null : StringArgumentType.getString(ctx, argName);
@@ -70,17 +70,17 @@ public final class GuildCommands {
 	private static int info(CommandContext<CommandSourceStack> ctx) {
 		ServerPlayer player = ctx.getSource().getPlayer();
 		if (player == null) {
-			ctx.getSource().sendFailure(Component.literal("Este comando necesita un jugador."));
+			ctx.getSource().sendFailure(Component.literal("This command needs a player."));
 			return 0;
 		}
 		Guilds.Guild guild = Guilds.of(server(player), name(player)).orElse(null);
 		if (guild == null) {
-			ctx.getSource().sendFailure(Component.literal("No estas en ningun gremio. Crea uno con /guild create <nombre>."));
+			ctx.getSource().sendFailure(Component.literal("You are not in a guild. Crea uno con /guild create <nombre>."));
 			return 0;
 		}
-		String text = "Gremio " + guild.name() + " (" + guild.members().size() + " miembros)\n"
-				+ "  fundador: " + guild.owner() + "\n"
-				+ "  miembros: " + String.join(", ", guild.members());
+		String text = "Guild " + guild.name() + " (" + guild.members().size() + " members)\n"
+				+ "  founder: " + guild.owner() + "\n"
+				+ "  members: " + String.join(", ", guild.members());
 		ctx.getSource().sendSuccess(() -> Component.literal(text), false);
 		return guild.members().size();
 	}

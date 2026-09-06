@@ -55,7 +55,7 @@ public final class MailBox {
 			int pending = inbox(server, handler.player.getGameProfile().name()).size();
 			if (pending > 0) {
 				handler.player.sendSystemMessage(Component.literal(
-						"Tienes " + pending + " carta(s). Usa /mail read para leerlas."));
+						"You have " + pending + " letter(s). Use /mail read to open them."));
 			}
 		});
 	}
@@ -70,7 +70,7 @@ public final class MailBox {
 		ServerPlayer online = server.getPlayerList().getPlayerByName(recipient);
 		if (online != null) {
 			online.sendSystemMessage(Component.literal(
-					"Carta nueva de " + mail.sender() + ". Usa /mail read."));
+					"New mail from " + mail.sender() + ". Use /mail read."));
 		}
 	}
 
@@ -91,7 +91,7 @@ public final class MailBox {
 					java.time.Instant.ofEpochSecond(mail.epochSeconds()), java.time.ZoneOffset.UTC).toString();
 			String line = "[" + when + "] " + mail.sender()
 					+ (mail.text().isEmpty() ? "" : ": " + mail.text())
-					+ (mail.item().isPresent() ? " (+ item adjunto)" : "");
+					+ (mail.item().isPresent() ? " (+ attached item)" : "");
 			player.sendSystemMessage(Component.literal(line));
 			// placeItemBackInInventory mete el stack donde quepa y suelta al suelo el resto:
 			// no se pierde nada aunque el inventario este lleno.

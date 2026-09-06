@@ -43,7 +43,7 @@ public final class BoardMenu extends ChestMenu {
 		player.openMenu(new SimpleMenuProvider(
 				(syncId, inventory, opener) ->
 						new BoardMenu(syncId, (ServerPlayer) opener, level, pos, container),
-				Component.literal("Tablon de anuncios")));
+				Component.literal("Bulletin Board")));
 	}
 
 	@Override

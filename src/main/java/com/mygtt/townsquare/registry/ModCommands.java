@@ -36,43 +36,43 @@ public final class ModCommands {
 	private static int onLookedAtLectern(CommandContext<CommandSourceStack> ctx, boolean create) {
 		ServerPlayer player = ctx.getSource().getPlayer();
 		if (player == null) {
-			ctx.getSource().sendFailure(Component.literal("Este comando necesita un jugador."));
+			ctx.getSource().sendFailure(Component.literal("This command needs a player."));
 			return 0;
 		}
 
 		HitResult hit = player.pick(8, 1.0f, false);
 		if (!(hit instanceof BlockHitResult blockHit) || hit.getType() != HitResult.Type.BLOCK) {
-			ctx.getSource().sendFailure(Component.literal("Mira a un atril a 8 bloques o menos."));
+			ctx.getSource().sendFailure(Component.literal("Look at a lectern within 8 blocks."));
 			return 0;
 		}
 
 		BlockPos pos = blockHit.getBlockPos();
 		if (create) {
 			if (!Boards.create(player.level(), pos)) {
-				ctx.getSource().sendFailure(Component.literal("Eso no es un atril. El tablon se crea mirando a un atril."));
+				ctx.getSource().sendFailure(Component.literal("That's not a lectern. Look at a lectern to create a board."));
 				return 0;
 			}
 			ctx.getSource().sendSuccess(() -> Component.literal(
-					"Tablon creado en " + pos.getX() + " " + pos.getY() + " " + pos.getZ()
-							+ ". Cualquier jugador puede usarlo ya."), false);
+					"Board created at " + pos.getX() + " " + pos.getY() + " " + pos.getZ()
+							+ ". Any player can use it now."), false);
 			return 1;
 		}
 
 		if (!Boards.remove(player.level(), pos)) {
-			ctx.getSource().sendFailure(Component.literal("Ahi no hay ningun tablon."));
+			ctx.getSource().sendFailure(Component.literal("There is no board there."));
 			return 0;
 		}
-		ctx.getSource().sendSuccess(() -> Component.literal("Tablon eliminado. Sus notas se han descartado."), false);
+		ctx.getSource().sendSuccess(() -> Component.literal("Board removed. Its notes were discarded."), false);
 		return 1;
 	}
 
 	private static void buildMail(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(Commands.literal("mail")
 				.then(Commands.literal("send")
-						.then(Commands.argument("entrada", StringArgumentType.greedyString())
+						.then(Commands.argument("message", StringArgumentType.greedyString())
 								.executes(ModCommands::mailSend)))
 				.then(Commands.literal("sendbook")
-						.then(Commands.argument("jugador", StringArgumentType.word())
+						.then(Commands.argument("player", StringArgumentType.word())
 								.executes(ModCommands::mailSendBook)))
 				.then(Commands.literal("read").executes(ModCommands::mailRead)));
 	}
@@ -81,18 +81,18 @@ public final class ModCommands {
 	private static int mailSend(CommandContext<CommandSourceStack> ctx) {
 		ServerPlayer player = ctx.getSource().getPlayer();
 		if (player == null) {
-			ctx.getSource().sendFailure(Component.literal("Este comando necesita un jugador."));
+			ctx.getSource().sendFailure(Component.literal("This command needs a player."));
 			return 0;
 		}
-		String[] parts = StringArgumentType.getString(ctx, "entrada").trim().split("\\s+", 2);
+		String[] parts = StringArgumentType.getString(ctx, "message").trim().split("\\s+", 2);
 		if (parts.length < 2 || parts[1].isBlank()) {
-			ctx.getSource().sendFailure(Component.literal("Uso: /mail send <jugador> <texto>"));
+			ctx.getSource().sendFailure(Component.literal("Usage: /mail send <player> <text>"));
 			return 0;
 		}
 		MailBox.send(player.level().getServer(), parts[0], new MailBox.Mail(
 				player.getGameProfile().name(), parts[1], java.util.Optional.empty(),
 				java.time.Instant.now().getEpochSecond()));
-		ctx.getSource().sendSuccess(() -> Component.literal("Carta enviada a " + parts[0] + "."), false);
+		ctx.getSource().sendSuccess(() -> Component.literal("Mail sent to " + parts[0] + "."), false);
 		return 1;
 	}
 
@@ -100,32 +100,32 @@ public final class ModCommands {
 	private static int mailSendBook(CommandContext<CommandSourceStack> ctx) {
 		ServerPlayer player = ctx.getSource().getPlayer();
 		if (player == null) {
-			ctx.getSource().sendFailure(Component.literal("Este comando necesita un jugador."));
+			ctx.getSource().sendFailure(Component.literal("This command needs a player."));
 			return 0;
 		}
 		ItemStack held = player.getMainHandItem();
 		if (held.isEmpty()) {
-			ctx.getSource().sendFailure(Component.literal("Lleva en la mano el libro o item que quieras enviar."));
+			ctx.getSource().sendFailure(Component.literal("Hold the book or item you want to send."));
 			return 0;
 		}
-		String recipient = StringArgumentType.getString(ctx, "jugador");
+		String recipient = StringArgumentType.getString(ctx, "player");
 		MailBox.send(player.level().getServer(), recipient, new MailBox.Mail(
 				player.getGameProfile().name(), "", java.util.Optional.of(held.copy()),
 				java.time.Instant.now().getEpochSecond()));
 		held.setCount(0);
-		ctx.getSource().sendSuccess(() -> Component.literal("Enviado a " + recipient + "."), false);
+		ctx.getSource().sendSuccess(() -> Component.literal("Sent to " + recipient + "."), false);
 		return 1;
 	}
 
 	private static int mailRead(CommandContext<CommandSourceStack> ctx) {
 		ServerPlayer player = ctx.getSource().getPlayer();
 		if (player == null) {
-			ctx.getSource().sendFailure(Component.literal("Este comando necesita un jugador."));
+			ctx.getSource().sendFailure(Component.literal("This command needs a player."));
 			return 0;
 		}
 		int delivered = MailBox.deliver(player);
 		if (delivered == 0) {
-			ctx.getSource().sendSuccess(() -> Component.literal("No tienes cartas."), false);
+			ctx.getSource().sendSuccess(() -> Component.literal("You have no mail."), false);
 		}
 		return delivered;
 	}
@@ -133,12 +133,12 @@ public final class ModCommands {
 	private static int list(CommandContext<CommandSourceStack> ctx) {
 		ServerPlayer player = ctx.getSource().getPlayer();
 		if (player == null) {
-			ctx.getSource().sendFailure(Component.literal("Este comando necesita un jugador."));
+			ctx.getSource().sendFailure(Component.literal("This command needs a player."));
 			return 0;
 		}
 		int count = Boards.count(player.level());
 		ctx.getSource().sendSuccess(() -> Component.literal(
-				"Tablones en esta dimension: " + count), false);
+				"Boards in this dimension: " + count), false);
 		return count;
 	}
 }

@@ -30,7 +30,10 @@ jars de `.gradle/loom-cache/` antes de usar una API nueva.
 3. La logica sin Minecraft va en paquetes puros y se testea sin arrancar el juego.
    Lo que toca Minecraft, en una capa fina aparte. Mantener esa frontera.
 4. Persistencia con codecs, nunca NBT a mano, y siempre con version de esquema.
-5. IDs en ingles snake_case. Textos visibles en `lang/`, nunca hardcodeados.
+5. IDs en ingles snake_case. Textos al jugador en INGLES y como texto plano:
+   las claves de `lang/` las resuelve el cliente, y nuestros jugadores no tienen
+   el mod, asi que verian la clave cruda. Excepcion consciente a la practica
+   habitual, valida solo mientras el mod sea 100% server-side.
 6. Desconectarse nunca puede mejorar la posicion del jugador.
 
 ## Estado actual
@@ -47,8 +50,9 @@ Los gremios funcionan: create/invite/join/leave/info y chat con /g. El fundador
 no abandona: disuelve. Pertenencia derivada escaneando, sin indice aparte.
 El tablon ya filtra: solo retiene libros, lo demas se devuelve al cerrar.
 
-Siguiente: pulir para publicar (lang en_us+es_es, README, probar en dedicado
-con 2 cuentas).
+Pulido hecho: mensajes en ingles, README, LICENSE MIT, version 1.0.0.
+Antes de publicar: probar en dedicado con 2 cuentas (invite/join/mail entre
+dos jugadores) y hacer un icono 128x128.
 se abre un contenedor con las notas (libros escritos); clavar y quitar notas.
 
 ## Comandos utiles
