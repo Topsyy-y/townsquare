@@ -7,7 +7,7 @@
 	"authors": ["my_gtt"],
 	"contact": {},
 	"license": "MIT",
-	"environment": "server",
+	"environment": "*",
 	"entrypoints": {
 		"main": ["com.mygtt.townsquare.Townsquare"]
 	},

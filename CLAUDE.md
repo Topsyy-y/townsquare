@@ -2,8 +2,8 @@
 
 Mod social server-side para servidores Fabric, Minecraft 1.21.11. Modid: `townsquare`.
 Tablones comunitarios, correo entre jugadores y gremios. **Los jugadores no
-instalan nada**: `"environment": "server"` en fabric.mod.json, y eso es una
-regla, no un detalle.
+instalan nada**: `"environment": "*"` para poder cargarlo tambien en solitario; la garantia de
+cero instalacion es no tener contenido cliente, no ese flag.
 
 ## Decisiones fundacionales
 
