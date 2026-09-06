@@ -69,10 +69,13 @@ public final class ModCommands {
 	private static void buildMail(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(Commands.literal("mail")
 				.then(Commands.literal("send")
-						.then(Commands.argument("message", StringArgumentType.greedyString())
-								.executes(ModCommands::mailSend)))
+						.then(Commands.argument("player", StringArgumentType.word())
+								.suggests(ModCommands::suggestOnlinePlayers)
+								.then(Commands.argument("text", StringArgumentType.greedyString())
+										.executes(ModCommands::mailSend))))
 				.then(Commands.literal("sendbook")
 						.then(Commands.argument("player", StringArgumentType.word())
+								.suggests(ModCommands::suggestOnlinePlayers)
 								.executes(ModCommands::mailSendBook)))
 				.then(Commands.literal("read").executes(ModCommands::mailRead)));
 	}
@@ -84,15 +87,12 @@ public final class ModCommands {
 			ctx.getSource().sendFailure(Component.literal("This command needs a player."));
 			return 0;
 		}
-		String[] parts = StringArgumentType.getString(ctx, "message").trim().split("\\s+", 2);
-		if (parts.length < 2 || parts[1].isBlank()) {
-			ctx.getSource().sendFailure(Component.literal("Usage: /mail send <player> <text>"));
-			return 0;
-		}
-		MailBox.send(player.level().getServer(), parts[0], new MailBox.Mail(
-				player.getGameProfile().name(), parts[1], java.util.Optional.empty(),
+		String recipient = StringArgumentType.getString(ctx, "player");
+		String text = StringArgumentType.getString(ctx, "text");
+		MailBox.send(player.level().getServer(), recipient, new MailBox.Mail(
+				player.getGameProfile().name(), text, java.util.Optional.empty(),
 				java.time.Instant.now().getEpochSecond()));
-		ctx.getSource().sendSuccess(() -> Component.literal("Mail sent to " + parts[0] + "."), false);
+		ctx.getSource().sendSuccess(() -> Component.literal(deliveryNote(player, recipient)), false);
 		return 1;
 	}
 
@@ -113,8 +113,22 @@ public final class ModCommands {
 				player.getGameProfile().name(), "", java.util.Optional.of(held.copy()),
 				java.time.Instant.now().getEpochSecond()));
 		held.setCount(0);
-		ctx.getSource().sendSuccess(() -> Component.literal("Sent to " + recipient + "."), false);
+		ctx.getSource().sendSuccess(() -> Component.literal(deliveryNote(player, recipient)), false);
 		return 1;
+	}
+
+	/** Deja claro a quien fue y si esta conectado: los envios a un nombre mal escrito se ven aqui. */
+	private static String deliveryNote(ServerPlayer sender, String recipient) {
+		boolean online = sender.level().getServer().getPlayerList().getPlayerByName(recipient) != null;
+		return "Mail sent to " + recipient + (online ? "." : " (offline: delivered when they log in).");
+	}
+
+	private static java.util.concurrent.CompletableFuture<com.mojang.brigadier.suggestion.Suggestions> suggestOnlinePlayers(
+			CommandContext<CommandSourceStack> ctx, com.mojang.brigadier.suggestion.SuggestionsBuilder builder) {
+		for (ServerPlayer online : ctx.getSource().getServer().getPlayerList().getPlayers()) {
+			builder.suggest(online.getGameProfile().name());
+		}
+		return builder.buildFuture();
 	}
 
 	private static int mailRead(CommandContext<CommandSourceStack> ctx) {
