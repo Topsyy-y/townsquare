@@ -14,6 +14,8 @@ public class Townsquare implements ModInitializer {
 	public void onInitialize() {
 		Boards.register();
 		com.mygtt.townsquare.mail.MailBox.register();
+		com.mygtt.townsquare.guild.Guilds.register();
+		com.mygtt.townsquare.guild.GuildCommands.register();
 		ModCommands.register();
 		LOGGER.info("[Townsquare] Initialised. Boards ready.");
 	}

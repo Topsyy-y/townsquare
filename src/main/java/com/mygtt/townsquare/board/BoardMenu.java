@@ -50,10 +50,20 @@ public final class BoardMenu extends ChestMenu {
 	public void removed(Player player) {
 		super.removed(player);
 
-		List<ItemStack> stacks = new ArrayList<>(SLOTS);
+		// El tablon solo retiene libros. Cualquier otra cosa que alguien deje se le
+		// devuelve al cerrar: filtrar por ranura exigiria un menu propio, y devolver
+		// consigue lo mismo sin tocar internals de vanilla.
+		List<ItemStack> kept = new ArrayList<>(SLOTS);
 		for (int i = 0; i < SLOTS; i++) {
-			stacks.add(container.getItem(i));
+			ItemStack stack = container.getItem(i);
+			if (stack.isEmpty() || stack.getItem() == net.minecraft.world.item.Items.WRITTEN_BOOK
+					|| stack.getItem() == net.minecraft.world.item.Items.WRITABLE_BOOK) {
+				kept.add(stack);
+			} else {
+				kept.add(ItemStack.EMPTY);
+				player.getInventory().placeItemBackInInventory(stack);
+			}
 		}
-		Boards.save(level, pos, stacks);
+		Boards.save(level, pos, kept);
 	}
 }

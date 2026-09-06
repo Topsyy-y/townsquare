@@ -43,7 +43,12 @@ El correo funciona: /mail send <jugador> <texto>, /mail sendbook (adjunta el ite
 de la mano), aviso al conectar y entrega con /mail read. Buzones por nombre en
 minusculas en un attachment del overworld: funciona con el destinatario offline.
 
-Siguiente: filtro de solo-libros en el tablon, o los gremios.
+Los gremios funcionan: create/invite/join/leave/info y chat con /g. El fundador
+no abandona: disuelve. Pertenencia derivada escaneando, sin indice aparte.
+El tablon ya filtra: solo retiene libros, lo demas se devuelve al cerrar.
+
+Siguiente: pulir para publicar (lang en_us+es_es, README, probar en dedicado
+con 2 cuentas).
 se abre un contenedor con las notas (libros escritos); clavar y quitar notas.
 
 ## Comandos utiles
