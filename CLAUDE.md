@@ -35,9 +35,11 @@ jars de `.gradle/loom-cache/` antes de usar una API nueva.
 
 ## Estado actual
 
-Esqueleto. Compila, no hace nada.
+El tablon funciona: comando de admin sobre un atril, cofre de vanilla al usarlo,
+contenido persistido por dimension via attachment con codec. Verificado en
+servidor dedicado; falta probarlo con jugador conectado.
 
-Siguiente: el tablon. Comando de admin que marca un atril como tablon; al usarlo
+Siguiente: filtrar que solo entren libros en el tablon, y despues el correo.
 se abre un contenedor con las notas (libros escritos); clavar y quitar notas.
 
 ## Comandos utiles

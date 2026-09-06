@@ -1,5 +1,7 @@
 package com.mygtt.townsquare;
 
+import com.mygtt.townsquare.board.Boards;
+import com.mygtt.townsquare.registry.ModCommands;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +12,8 @@ public class Townsquare implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		LOGGER.info("[Townsquare] Initialised.");
+		Boards.register();
+		ModCommands.register();
+		LOGGER.info("[Townsquare] Initialised. Boards ready.");
 	}
 }
