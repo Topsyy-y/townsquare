@@ -104,6 +104,11 @@ public final class MailBox {
 		return inbox.size();
 	}
 
+	/** Nombres (en minusculas) con buzon existente. */
+	public static java.util.Set<String> knownRecipients(MinecraftServer server) {
+		return new java.util.TreeSet<>(all(server).keySet());
+	}
+
 	private static Map<String, List<Mail>> all(MinecraftServer server) {
 		return server.overworld().getAttachedOrCreate(type, HashMap::new);
 	}

@@ -160,6 +160,15 @@ public final class Guilds {
 		}
 	}
 
+	/** Nombres (en minusculas) de todos los miembros de todos los gremios. */
+	public static java.util.Set<String> knownMemberNames(MinecraftServer server) {
+		java.util.Set<String> names = new java.util.TreeSet<>();
+		for (Guild guild : all(server).values()) {
+			names.addAll(guild.members());
+		}
+		return names;
+	}
+
 	private static Map<String, Guild> all(MinecraftServer server) {
 		return server.overworld().getAttachedOrCreate(type, HashMap::new);
 	}

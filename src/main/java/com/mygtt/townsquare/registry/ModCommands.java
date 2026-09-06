@@ -125,8 +125,17 @@ public final class ModCommands {
 
 	private static java.util.concurrent.CompletableFuture<com.mojang.brigadier.suggestion.Suggestions> suggestOnlinePlayers(
 			CommandContext<CommandSourceStack> ctx, com.mojang.brigadier.suggestion.SuggestionsBuilder builder) {
+		// Conectados con su nombre tal cual, y ademas cualquier nombre que el servidor ya
+		// conozca (miembros de gremios, buzones existentes): asi se puede elegir tambien a
+		// un desconectado. Escribir un nombre que no salga en la lista sigue valiendo.
+		java.util.Set<String> names = new java.util.TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 		for (ServerPlayer online : ctx.getSource().getServer().getPlayerList().getPlayers()) {
-			builder.suggest(online.getGameProfile().name());
+			names.add(online.getGameProfile().name());
+		}
+		names.addAll(com.mygtt.townsquare.guild.Guilds.knownMemberNames(ctx.getSource().getServer()));
+		names.addAll(MailBox.knownRecipients(ctx.getSource().getServer()));
+		for (String name : names) {
+			builder.suggest(name);
 		}
 		return builder.buildFuture();
 	}
