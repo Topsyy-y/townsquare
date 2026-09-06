@@ -125,19 +125,22 @@ public final class ModCommands {
 
 	private static java.util.concurrent.CompletableFuture<com.mojang.brigadier.suggestion.Suggestions> suggestOnlinePlayers(
 			CommandContext<CommandSourceStack> ctx, com.mojang.brigadier.suggestion.SuggestionsBuilder builder) {
-		// Conectados con su nombre tal cual, y ademas cualquier nombre que el servidor ya
-		// conozca (miembros de gremios, buzones existentes): asi se puede elegir tambien a
-		// un desconectado. Escribir un nombre que no salga en la lista sigue valiendo.
+		// Conectados con su nombre tal cual, mas cualquier nombre que el servidor ya
+		// conozca (miembros de gremios, buzones existentes), MENOS uno mismo. El filtrado
+		// por el prefijo tecleado lo hace SharedSuggestionProvider, igual que vanilla: sin
+		// el, el cliente recibia la lista entera y el Tab completaba cualquier cosa.
+		// Escribir un nombre que no salga en la lista sigue valiendo.
 		java.util.Set<String> names = new java.util.TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 		for (ServerPlayer online : ctx.getSource().getServer().getPlayerList().getPlayers()) {
 			names.add(online.getGameProfile().name());
 		}
 		names.addAll(com.mygtt.townsquare.guild.Guilds.knownMemberNames(ctx.getSource().getServer()));
 		names.addAll(MailBox.knownRecipients(ctx.getSource().getServer()));
-		for (String name : names) {
-			builder.suggest(name);
+		ServerPlayer self = ctx.getSource().getPlayer();
+		if (self != null) {
+			names.remove(self.getGameProfile().name());
 		}
-		return builder.buildFuture();
+		return net.minecraft.commands.SharedSuggestionProvider.suggest(names, builder);
 	}
 
 	private static int mailRead(CommandContext<CommandSourceStack> ctx) {
